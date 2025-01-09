@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule} from '@angular/common';
-import { Component, inject} from '@angular/core';
+import { Component, inject, OnDestroy} from '@angular/core';
 import { Game } from '../../models/game';
 import { ProfileComponent } from "../profile/profile.component";
 import { MatDividerModule } from '@angular/material/divider';
@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import {MatInputModule} from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { GameInfoComponent } from "../game-info/game-info.component";
-import { Firestore, addDoc, collection, collectionData, doc, docData, docSnapshots, documentId, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
+import { Firestore, addDoc, collection, collectionData, doc, docData, docSnapshots, documentId, getDoc, getDocs, onSnapshot, setDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -23,12 +23,11 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './game.component.scss'
 })
 export class GameComponent{
-
-   
     game: Game = new Game();
     gameId:string |null = null;;
     firestore: Firestore =inject(Firestore);
     items$: Observable<any[]>;
+    private unsub:(() => void) | null = null;
 
 
 constructor(public dialog: MatDialog, private route: ActivatedRoute, private router: Router){
@@ -44,9 +43,8 @@ constructor(public dialog: MatDialog, private route: ActivatedRoute, private rou
         if(this.gameId){
           const gameDocRef = doc(this.firestore, 'games', this.gameId);
 
-        docSnapshots(gameDocRef).subscribe((snapshot) => {
-          if (snapshot.exists()) {
-            const gameData = snapshot.data() as Game;
+          this.unsub = onSnapshot(gameDocRef, (doc => {
+            const gameData = doc.data() as Game;
             console.log('Game update:', gameData);
   
             this.game.currentPlayer = gameData.currentPlayer;
@@ -55,10 +53,8 @@ constructor(public dialog: MatDialog, private route: ActivatedRoute, private rou
             this.game.stack = gameData.stack;
             this.game.pickCardAnimation = gameData.pickCardAnimation;
             this.game.currentCard = gameData.currentCard;
-          } else {
-            console.error('No such document!')
-          }
-        })
+          }))
+
         }
   }
 
@@ -115,8 +111,4 @@ constructor(public dialog: MatDialog, private route: ActivatedRoute, private rou
   }
 
 }
-
-
-
-
 
