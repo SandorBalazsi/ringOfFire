@@ -26,7 +26,8 @@ export class DialogAddPlayerComponent {
   readonly data = inject(MatDialog);
 
 
-constructor(private dialog: MatDialog){}
+constructor(private dialog: MatDialog){
+}
 
 onNoClick(){
 this.dialogRef.close();

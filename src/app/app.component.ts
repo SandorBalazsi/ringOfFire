@@ -1,7 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { Firestore } from '@angular/fire/firestore';
-
 import { MatButtonModule} from '@angular/material/button';
 import { RouterOutlet } from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
@@ -17,7 +15,6 @@ import { GameInfoComponent } from './game-info/game-info.component';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  firestore: Firestore = inject(Firestore);
   title = 'ringOfFire';
 }
 
